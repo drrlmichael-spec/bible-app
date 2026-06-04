@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; background: transparent; color: #ccfbf1; }
+        .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 10px; }
+        
+        .canva-card-wrapper {
+            background: linear-gradient(135deg, #0d4d4d 0%, #0a3d3d 100%);
+            border: 1px solid rgba(20, 184, 166, 0.2);
+            border-radius: 1.25rem; padding: 1.5rem;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+        }
+
+        .form-section { 
+            background: rgba(0, 0, 0, 0.15); border: 1px solid rgba(20, 184, 166, 0.25); 
+            border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.5rem; 
+        }
+
+        .section-label { color: #14b8a6; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; display: block; margin-bottom: 1rem; letter-spacing: 0.1em; }
+
+        /* NEAT GRID FOR BUTTONS */
+        .feeling-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); /* Forces exactly 2 columns */
+            gap: 10px; 
+            margin-bottom: 1rem; 
+        }
+
+        .feeling-btn { 
+            padding: 12px; border: 2px solid #0d9488; background: rgba(20, 184, 166, 0.1); 
+            color: #99f6e4; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem;
+            text-align: center; transition: 0.2s;
+        }
+
+        .feeling-btn.active { background: #14b8a6; color: white; border-color: #14b8a6; }
+
+        .verse-chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .verse-chip { background: #0f766e; color: white; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; }
+
+        /* SEARCH INTERFACE STYLING */
+        .search-group { display: flex; gap: 8px; }
+        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #0f766e; border-radius: 8px; background: #0a3d3d; color: #ccfbf1; font-size: 0.95rem; }
+        .btn-primary { background: #14b8a6; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+        .display-box { background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 8px; margin-top: 1rem; line-height: 1.6; border-left: 4px solid #14b8a6; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="canva-card-wrapper">
+
+        <!-- CATEGORY SECTION -->
+        <div class="form-section">
+            <label class="section-label">😊 How do you feel?</label>
+            <div class="feeling-grid">
+                <button class="feeling-btn" onclick="handleFeeling('Anxious', this)">😰 Anxious</button>
+                <button class="feeling-btn" onclick="handleFeeling('Depressed', this)">😔 Depressed</button>
+                <button class="feeling-btn" onclick="handleFeeling('Lonely', this)">🥺 Lonely</button>
+                <button class="feeling-btn" onclick="handleFeeling('Weak', this)">😞 Weak</button>
+                <button class="feeling-btn" onclick="handleFeeling('Ashamed', this)">😳 Ashamed</button>
+                <button class="feeling-btn" onclick="handleFeeling('Hopeful', this)">✨ Hopeful</button>
+                <button class="feeling-btn" onclick="handleFeeling('Grateful', this)">🙏 Grateful</button>
+                <button class="feeling-btn" onclick="handleFeeling('Struggling', this)">⚠️ Struggling</button>
+            </div>
+            <div id="suggested-display" class="display-box"></div>
+        </div>
+
+        <!-- BIBLE SEARCH SECTION (This is where the app lived) -->
+        <div class="form-section">
+            <label class="section-label">📖 Bible Search</label>
+            <div class="search-group">
+                <input type="text" id="verse-ref" placeholder="e.g. John 3:16">
+                <button class="btn-primary" onclick="searchVerse()">Search</button>
+            </div>
+            <div id="search-display" class="display-box"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const BIBLE_API_URL = 'https://api.esv.org/v3/passage/text/';
+const BIBLE_API_KEY = 'b40eac1061c96b9e01a2e0a8570430b541f4a253';
+
+const feelingVerses = {
+    'Anxious': ['Philippians 4:6-7', '1 Peter 5:7', 'John 14:27', 'Matthew 6:34', 'Isaiah 41:10'],
+    'Depressed': ['Psalm 34:18', 'Matthew 11:28', 'Psalm 42:11', 'Isaiah 40:31'],
+    'Lonely': ['Psalm 25:16', 'Hebrews 13:5', 'Matthew 28:20'],
+    'Weak': ['2 Corinthians 12:9', 'Isaiah 40:29', 'Philippians 4:13'],
+    'Ashamed': ['Romans 8:1', '1 John 1:9', 'Psalm 103:12'],
+    'Hopeful': ['Romans 15:13', 'Lamentations 3:22-23', 'Hebrews 11:1'],
+    'Grateful': ['1 Thessalonians 5:18', 'Psalm 107:1', 'Colossians 3:15'],
+    'Struggling': ['James 1:2-4', '1 Corinthians 10:13', 'Romans 8:28']
+    // (You can add the rest of your 160 verses here inside these arrays!)
+};
+
+async function fetchVerse(ref) {
+    try {
+        const res = await fetch(`${BIBLE_API_URL}?q=${encodeURIComponent(ref)}&include-passage-references=true&include-footnotes=false&include-headings=false`, {
+            headers: { 'Authorization': `Token ${BIBLE_API_KEY}` }
+        });
+        const data = await res.json();
+        return data.passages[0] || "Verse not found.";
+    } catch { return "Error loading verse."; }
+}
+
+async function handleFeeling(feeling, btn) {
+    document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const display = document.getElementById('suggested-display');
+    display.style.display = 'block';
+    let html = `<p style="font-size:0.75rem; margin-bottom:10px; color:#14b8a6;">CHOOSE A VERSE:</p><div class="verse-chip-container">`;
+    feelingVerses[feeling].forEach(ref => {
+        html += `<button class="verse-chip" onclick="loadChipVerse('${ref}')">${ref}</button>`;
+    });
+    html += `</div><div id="chip-content" style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; display:none;"></div>`;
+    display.innerHTML = html;
+}
+
+async function loadChipVerse(ref) {
+    const area = document.getElementById('chip-content');
+    area.style.display = 'block';
+    area.innerHTML = '<i>Loading...</i>';
+    const text = await fetchVerse(ref);
+    area.innerHTML = `<strong>${ref}</strong><br><br>${text}`;
+}
+
+async function searchVerse() {
+    const ref = document.getElementById('verse-ref').value;
+    const display = document.getElementById('search-display');
+    if(!ref) return;
+    display.style.display = 'block';
+    display.innerHTML = '<i>Searching...</i>';
+    const text = await fetchVerse(ref);
+    display.innerHTML = text;
+}
+</script>
+
+</body>
+</html>
