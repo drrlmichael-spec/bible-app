@@ -23,15 +23,9 @@
         input[type="text"] { flex: 1; padding: 12px; border: 1px solid #00ffff; border-radius: 8px; background: rgba(0, 0, 0, 0.3); color: #ffffff; font-size: 0.95rem; } 
         input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.6); } 
         .btn-primary { background: #00ffff; color: #008b8b; border: none; padding: 0 20px; border-radius: 8px; font-weight: 700; cursor: pointer; } 
-        .display-box { background: rgba(0,0,0,0.4); padding: 1.25rem; border-radius: 8px; margin-top: 1rem; line-height: 1.6; border-left: 4px solid #00ffff; display: none; }
+        .display-box { background: rgba(0,0,0,0.4); padding: 1.25rem; border-radius: 8px; margin-top: 1rem; line-height: 1.6; border-left: 4px solid #00ffff; display: none; white-space: pre-line; }
         .btn-back-to-site { display: block; width: 100%; margin-top: 1.5rem; padding: 12px; background: transparent; color: #00ffff; border: 2px solid #00ffff; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-align: center; transition: 0.2s; } 
         .btn-back-to-site:hover { background: rgba(0, 255, 255, 0.1); } 
-
-        /* Overriding ESV margin values to clean up spacing layout weirdness */
-        .display-box p { margin: 0 0 8px 0 !important; padding: 0 !important; line-height: 1.5 !important; }
-        .display-box h2, .display-box h3, .display-box h4 { margin: 4px 0 !important; padding: 0 !important; font-size: 1rem !important; }
-        .display-box .chapter-num, .display-box .verse-num { font-weight: bold; color: #00ffff; font-size: 0.8rem; vertical-align: super; margin-right: 4px; }
-        .display-box .extra_space { display: none !important; }
     </style> 
 </head> 
 <body> 
@@ -66,7 +60,7 @@
 </div> 
 
 <script>
-const BIBLE_API_URL = 'https://esv.org'; 
+const BIBLE_API_URL = 'https://allorigins.win';
 const BIBLE_API_KEY = 'b40eac1061c96b9e01a2e0a8570430b541f4a253';
 
 const feelingVerses = { 
@@ -82,11 +76,11 @@ const feelingVerses = {
 
 async function fetchVerse(ref) {
     try {
-        const targetUrl = `${BIBLE_API_URL}?q=${encodeURIComponent(ref)}&include-passage-references=true&include-footnotes=false&include-headings=false`;
-        const proxyUrl = 'https://corsproxy.io' + encodeURIComponent(targetUrl);
-        const res = await fetch(proxyUrl, { headers: { 'Authorization': `Token ${BIBLE_API_KEY}` } });
+        const targetUrl = `https://esv.org{encodeURIComponent(ref)}&include-passage-references=false&include-footnotes=false&include-headings=false`;
+        const res = await fetch(BIBLE_API_URL + encodeURIComponent(targetUrl));
         const data = await res.json();
-        return (data.passages && data.passages.length > 0) ? data.passages.join('') : "Verse not found.";
+        const esvData = JSON.parse(data.contents);
+        return (esvData.passages && esvData.passages.length > 0) ? esvData.passages.join('\n') : "Verse not found.";
     } catch (error) {
         console.error("Fetch Error:", error);
         return "Error loading verse.";
