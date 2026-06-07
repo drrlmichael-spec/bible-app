@@ -4,7 +4,9 @@
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>Bible Companion</title> 
-    <link href="https://googleapis.com" rel="stylesheet"> 
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet"> 
     <style> 
         * { box-sizing: border-box; } 
         body { margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; background: transparent; color: #ffffff; } 
@@ -24,6 +26,12 @@
         .display-box { background: rgba(0,0,0,0.4); padding: 1.25rem; border-radius: 8px; margin-top: 1rem; line-height: 1.6; border-left: 4px solid #00ffff; display: none; }
         .btn-back-to-site { display: block; width: 100%; margin-top: 1.5rem; padding: 12px; background: transparent; color: #00ffff; border: 2px solid #00ffff; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-align: center; transition: 0.2s; } 
         .btn-back-to-site:hover { background: rgba(0, 255, 255, 0.1); } 
+
+        /* CSS FIXES TO TIGHTEN UP INCOMING ESV PLUGINS */
+        .display-box p { margin: 0 0 8px 0 !important; padding: 0 !important; line-height: 1.5 !important; }
+        .display-box h2, .display-box h3, .display-box h4 { margin: 4px 0 !important; padding: 0 !important; font-size: 1rem !important; }
+        .display-box .chapter-num, .display-box .verse-num { font-weight: bold; color: #00ffff; font-size: 0.8rem; vertical-align: super; margin-right: 4px; }
+        .display-box .extra_space { display: none !important; }
     </style> 
 </head> 
 <body> 
@@ -60,6 +68,7 @@
     </div> 
 </div> 
 
+<script>
 // ====== 1. API CONFIGURATION ======
 const BIBLE_API_URL = 'https://esv.org'; 
 const BIBLE_API_KEY = 'b40eac1061c96b9e01a2e0a8570430b541f4a253';
@@ -111,6 +120,7 @@ async function handleFeeling(feeling, btn) {
     feelingVerses[feeling].forEach(ref => {
         html += `<button class="verse-chip" onclick="loadChipVerse('${ref}')">${ref}</button>`;
     });
+     });
     html += `</div><div id="chip-content" style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.2); padding-top:10px; display:none;"></div>`;
     display.innerHTML = html;
 }
