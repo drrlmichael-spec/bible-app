@@ -76,21 +76,23 @@ const feelingVerses = {
 
 async function fetchVerse(ref) {
     try {
-        // 1. Point directly to the clean text delivery URL layout structure
-        const targetUrl = `https://esv.org{encodeURIComponent(ref)}&include-passage-references=false&include-footnotes=false&include-headings=false`;
+        // 1. We attach your Authorization Token straight into the URL link parameters
+        const targetUrl = `https://esv.org{encodeURIComponent(ref)}&include-passage-references=false&include-footnotes=false&include-headings=false&Authorization=Token%20${BIBLE_API_KEY}`;
         
-        // 2. Encapsulate it securely inside the proxy base request gateway
-        const proxyUrl = 'https://corsproxy.io' + encodeURIComponent(targetUrl);
+        // 2. Route the full link through the AllOrigins secure browser proxy
+        const proxyUrl = `https://allorigins.win{encodeURIComponent(targetUrl)}`;
 
-        // 3. Inject the Authorization key directly into the proxy request header context 
-        const res = await fetch(proxyUrl, {
-            headers: {
-                'Authorization': `Token ${ESV_KEY}`
-            }
-        });
-        
+        const res = await fetch(proxyUrl);
         const data = await res.json();
-        return (data.passages && data.passages.length > 0) ? data.passages.join('\n') : "Verse not found.";
+        
+        // 3. Extract and parse the contents returned by AllOrigins
+        const esvData = JSON.parse(data.contents);
+        
+        if (esvData.passages && esvData.passages.length > 0) {
+            return esvData.passages.join('\n');
+        } else {
+            return "Verse not found.";
+        }
     } catch (error) {
         console.error("Fetch Error:", error);
         return "Error loading verse.";
