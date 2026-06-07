@@ -27,7 +27,7 @@
         .btn-back-to-site { display: block; width: 100%; margin-top: 1.5rem; padding: 12px; background: transparent; color: #00ffff; border: 2px solid #00ffff; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-align: center; transition: 0.2s; } 
         .btn-back-to-site:hover { background: rgba(0, 255, 255, 0.1); } 
 
-        /* CSS ESV Spacing Adjustments */
+        /* Overriding ESV margin values to clean up spacing layout weirdness */
         .display-box p { margin: 0 0 8px 0 !important; padding: 0 !important; line-height: 1.5 !important; }
         .display-box h2, .display-box h3, .display-box h4 { margin: 4px 0 !important; padding: 0 !important; font-size: 1rem !important; }
         .display-box .chapter-num, .display-box .verse-num { font-weight: bold; color: #00ffff; font-size: 0.8rem; vertical-align: super; margin-right: 4px; }
@@ -70,14 +70,14 @@ const BIBLE_API_URL = 'https://esv.org';
 const BIBLE_API_KEY = 'b40eac1061c96b9e01a2e0a8570430b541f4a253';
 
 const feelingVerses = { 
-    'Anxious': ["Philippians 4:6-7", "1 Peter 5:7", "Matthew 6:25", "Matthew 6:34", "Isaiah 41:10"], 
-    'Depressed': ["Psalm 34:18", "Psalm 42:11", "Psalm 30:5", "Romans 8:38-39", "Isaiah 40:31"], 
-    'Lonely': ["Deuteronomy 31:6", "Hebrews 13:5", "Psalm 25:16", "Psalm 68:6", "Matthew 28:20"], 
-    'Weak': ["2 Corinthians 12:9", "Isaiah 40:29", "Joel 3:10", "Ephesians 6:10", "Philippians 4:13"], 
-    'Ashamed': ["Romans 8:1", "Psalm 34:5", "Isaiah 43:25", "1 John 1:9", "Romans 10:11"], 
-    'Hopeful': ["Jeremiah 29:11", "Romans 15:13", "Lamentations 3:22-23", "Isaiah 40:31", "Romans 8:24-25"], 
-    'Grateful': ["1 Thessalonians 5:18", "Psalm 107:1", "Colossians 3:15", "Psalm 100:4", "Colossians 4:2"], 
-    'Struggling': ["Galatians 6:9", "James 1:2-3", "Romans 5:3-4", "John 16:33", "James 1:12"] 
+    'Anxious': ["Philippians 4:6-7", "1 Peter 5:7", "Matthew 6:25"], 
+    'Depressed': ["Psalm 34:18", "Psalm 42:11", "Psalm 30:5"], 
+    'Lonely': ["Deuteronomy 31:6", "Hebrews 13:5", "Psalm 25:16"], 
+    'Weak': ["2 Corinthians 12:9", "Isaiah 40:29", "Joel 3:10"], 
+    'Ashamed': ["Romans 8:1", "Psalm 34:5", "Isaiah 43:25"], 
+    'Hopeful': ["Jeremiah 29:11", "Romans 15:13", "Isaiah 40:31"], 
+    'Grateful': ["1 Thessalonians 5:18", "Psalm 107:1", "Colossians 3:15"], 
+    'Struggling': ["Galatians 6:9", "James 1:2-3", "Romans 5:3-4"] 
 };
 
 async function fetchVerse(ref) {
